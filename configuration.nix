@@ -5,7 +5,7 @@
 { config, pkgs, ... }:
 
 {
-  imports = [ ./hardware-configuration.nix ./bluetooth.nix <home-manager/nixos> ];
+  imports = [ ./hardware-configuration.nix ./fonts.nix ./bluetooth.nix <home-manager/nixos> ];
  
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
  
@@ -43,23 +43,30 @@
 
   environment.pathsToLink = [ "/libexec" ]; # links /libexec from derivations to /run/current-system/sw
   services.xserver = {
-    layout = "es";
     enable = true;
+    libinput = {
+      enable = true;
+      touchpad.scrollMethod = "edge";
+    };
+    displayManager = {
+      lightdm.enable = true;
+      startx.enable = true;
+      defaultSession = "xsession";
+      session = [{
+          manage = "desktop";
+          name = "xsession";
+          start = ''exec $HOME/.xsession'';
+      }];
+    };
 
     desktopManager = {
       xterm.enable = false;
     };
-   
-    displayManager = {
-        defaultSession = "none+i3";
-        setupCommands = ''
-          LEFT='HDMI-1'
-          RIGHT='HDMI-2'
-          ${pkgs.xorg.xrandr}/bin/xrandr --output "$LEFT" --left-of "$RIGHT"
-      '';
-    };
- 
+
+    layout = "es";
+    xkbOptions = "eurosign:e";
   };
+
   # Enable the X11 windowing system.
   #services.xserver.enable = true;
 
@@ -219,12 +226,12 @@
       inetutils # for telnet (TODO: In cli-essentials.nix?)
 
       feh # image viewer
-
       # TODO: Maybe these all in kubernetes-something
       kubernetes-helm
+      kubectl
+      kubectx
       helmfile
       kustomize
-
       # TODO: Maybe in virtualization
       vagrant
       podman-compose

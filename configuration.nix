@@ -5,7 +5,7 @@
 { config, pkgs, ... }:
 
 {
-  imports = [ ./hardware-configuration.nix ./fonts.nix ./bluetooth.nix <home-manager/nixos> ];
+  imports = [ ./hardware-configuration.nix ./fonts.nix ./bluetooth.nix ./java.nix <home-manager/nixos> ];
  
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
  
@@ -62,7 +62,16 @@
     desktopManager = {
       xterm.enable = false;
     };
-
+    xrandrHeads = [
+      {
+        output = "HDMI-1";
+        primary = true;
+      }
+      {
+        output = "HDMI-2";
+        primary = false;
+      }
+    ];
     layout = "es";
     xkbOptions = "eurosign:e";
   };
@@ -224,7 +233,8 @@
       deluge
       slack
       inetutils # for telnet (TODO: In cli-essentials.nix?)
-
+      krew
+      jetbrains.idea-community
       feh # image viewer
       # TODO: Maybe these all in kubernetes-something
       kubernetes-helm
